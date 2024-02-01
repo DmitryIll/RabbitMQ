@@ -1,7 +1,7 @@
 count_vm = 1
 
-hostname_blocks = ["rabiitmq"]
-name_bloks = ["rabiitmq"]
+hostname_blocks = ["rabbitmq"]
+name_bloks = ["rabbitmq"]
 
 core_fraction_blocks = ["100"] 
 cores_blocks = ["4"] 
