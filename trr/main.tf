@@ -62,10 +62,10 @@ resource "yandex_compute_instance" "vm" {
   }
 
 
-  provisioner "file" {
-    source      = "../docker-compose.yaml"
-    destination = "/home/dmil/docker-compose.yaml"
-  }
+#  provisioner "file" {
+#    source      = "../docker-compose.yaml"
+#    destination = "/home/dmil/docker-compose.yaml"
+#  }
     
 #----------------------------------------------------------
 
@@ -76,16 +76,13 @@ resource "yandex_compute_instance" "vm" {
     "sudo rabbitmq-plugins enable rabbitmq_management",
     "sudo rabbitmqctl add_user test passwd",
     "sudo rabbitmqctl set_user_tags test administrator",
-    "sudo rabbitmqctl set_permissions -p / test \".*\" \".*\" \".*\"",
-    "sudo apt install -y pip",
-    "sudo pip install pika",
-    "sudo ",
-    "sudo ",
-    "sudo ",
+    "sudo rabbitmqctl set_permissions -p / test \".*\" \".*\" \".*\""
     ]
   }
-#    "sudo rabbitmqctl set_permissions -p / test ".*" ".*" ".*""
-#    ,
+
+
+# "sudo apt install -y pip",
+#    "sudo pip install pika"
 #    "sudo apt-get install -y ca-certificates curl gnupg",
 #    "sudo install -m 0755 -d /etc/apt/keyrings",
 #    "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg",
