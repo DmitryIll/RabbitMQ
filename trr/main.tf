@@ -4,6 +4,7 @@ variable images_blocks {}
 variable cores_blocks {}
 variable memory_blocks {}
 variable core_fraction_blocks {}
+variable ip_blocks {}
 
 variable count_vm {}
 
@@ -32,10 +33,16 @@ resource "yandex_compute_instance" "vm" {
     }
   }
 
+#network_interface.0.ip_address
+
   network_interface {
     subnet_id = "${yandex_vpc_subnet.subnet-1.id}" 
+    ip_address = "${var.ip_blocks[count.index]}"
     nat       = true
   }
+
+
+
 
   scheduling_policy {
   preemptible = true
@@ -47,31 +54,36 @@ resource "yandex_compute_instance" "vm" {
 
 #---------- создаем папки -----
 
-  provisioner "remote-exec" {
-    inline = [
-     "cd ~",
-     "mkdir -pv configs"
-    ]
-  }
+#  provisioner "remote-exec" {
+#    inline = [
+#     "cd ~",
+#     "mkdir -pv configs"
+#    ]
+#  }
 
 #---------- копируем файлы ----
 
+
   provisioner "file" {
-    source      = "../docker-compose.yaml"
-    destination = "/home/dmil/docker-compose.yaml"
+    source      = "../scripts/consumer.py"
+    destination = "/home/dmil/consumer.py"
   }
 
-
-#  provisioner "file" {
-#    source      = "../docker-compose.yaml"
-#    destination = "/home/dmil/docker-compose.yaml"
-#  }
+  
+  provisioner "file" {
+    source      = "../scripts/producer.py"
+    destination = "/home/dmil/producer.py"
+  }
     
+
 #----------------------------------------------------------
 
   provisioner "remote-exec" {
     inline = [
     "sudo apt update",
+    "sudo -i",
+    "sudo echo \"192.168.10.10 rabbitmq1\" >> /etc/hosts" ,
+    "sudo echo \"192.168.10.11 rabbitmq2\" >> /etc/hosts" ,
     "sudo apt install -y rabbitmq-server",
     "sudo rabbitmq-plugins enable rabbitmq_management",
     "sudo rabbitmqctl add_user test passwd",
@@ -79,10 +91,13 @@ resource "yandex_compute_instance" "vm" {
     "sudo rabbitmqctl set_permissions -p / test \".*\" \".*\" \".*\""
     ]
   }
-
-
-# "sudo apt install -y pip",
+#    "sudo apt install -y pip",
 #    "sudo pip install pika"
+
+# rabbitmqctl set_policy ha-all "" '{"ha-mode":"all","ha-sync-mode":"automatic"}'
+# rabbitmqctl set_policy -p 'elma365vhost' MirrorAllQueues ".*" '{"ha-mode":"all"}'
+
+
 #    "sudo apt-get install -y ca-certificates curl gnupg",
 #    "sudo install -m 0755 -d /etc/apt/keyrings",
 #    "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg",
@@ -99,6 +114,12 @@ resource "yandex_compute_instance" "vm" {
 #    "sudo systemctl restart redis",
 #    "sudo chmod o+rx -R /var/log/redis",
 #    "sudo docker compose up -d"
+
+
+  #provisioner "file" {
+  #  source      = "../configs/.erlang.cookie"
+  #  destination = "/var/lib/rabbitmq/.erlang.cookie"
+  #}
 
 
     connection {

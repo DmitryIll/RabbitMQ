@@ -1,14 +1,17 @@
-count_vm = 1
+count_vm = 2
 
-hostname_blocks = ["rabbitmq"]
-name_bloks = ["rabbitmq"]
+hostname_blocks = ["rabbitmq1","rabbitmq2"]
+name_bloks = ["rabbitmq1","rabbitmq2"]
 
-core_fraction_blocks = ["100"] 
-cores_blocks = ["4"] 
-memory_blocks = ["4"]  
+core_fraction_blocks = ["100","100"] 
+cores_blocks = ["4","4"] 
+memory_blocks = ["4","4"]  
 
-images_blocks = ["fd82nvvtllmimo92uoul"]   #ubuntu
+images_blocks = ["fd82nvvtllmimo92uoul","fd82nvvtllmimo92uoul"]   #ubuntu
 
+
+ip_blocks = ["192.168.10.10",
+             "192.168.10.11"]
 
 
 #---------- черновики --------------

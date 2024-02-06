@@ -83,10 +83,58 @@ $ cat /etc/hosts
 192.168.0.11 rmq02
 ```
 После этого ваши машины могут пинговаться по имени.
-
 Затем объедините две машины в кластер и создайте политику ha-all на все очереди.
 
+#### Решение
+
+Через терраформ создал две ВМ (см. код в git).
+На обоих серверах добавил в hosts:
+
+```
+192.168.10.10 rabbitmq1
+192.168.10.11 rabbitmq2
+```
+еще добавил на обоих:
+
+```
+echo "12345" > /var/lib/rabbitmq/.erlang.cookie
+```
+На обоих серверах выполнил:
+
+```
+# systemctl restart rabbitmq-server.service
+# systemctl status rabbitmq-server.service
+```
+
+![alt text](image-7.png)
+
+На 2-м:
+```
+root@rabbitmq2:~# rabbitmqctl stop_app
+root@rabbitmq2:~# rabbitmqctl reset
+root@rabbitmq2:~# rabbitmqctl join_cluster rabbit@rabbitmq1
+root@rabbitmq2:~# rabbitmqctl start_app 
+root@rabbitmq2:~# rabbitmqctl cluster_status
+```  
+
+![alt text](image-8.png)
+
+То что были некоторые errors - нормально.
+
+![alt text](image-9.png)
+![alt text](image-10.png)
+
+На 1м сервере:
+
+```
+root@rabbitmq1:~# rabbitmqctl set_policy ha-all "" '{"ha-mode":"all","ha-sync-mode":"automatic"}'
+```
+![alt text](image-11.png)
+
 *В качестве решения домашнего задания приложите скриншоты из веб-интерфейса с информацией о доступных нодах в кластере и включённой политикой.*
+
+![alt text](image-12.png)
+![alt text](image-13.png)
 
 Также приложите вывод команды с двух нод:
 
@@ -94,15 +142,29 @@ $ cat /etc/hosts
 $ rabbitmqctl cluster_status
 ```
 
+![alt text](image-14.png)
+![alt text](image-15.png)
+
 Для закрепления материала снова запустите скрипт producer.py и приложите скриншот выполнения команды на каждой из нод:
 
 ```shell script
 $ rabbitmqadmin get queue='hello'
 ```
 
+![alt text](image-16.png)
+![alt text](image-17.png)
+
+
 После чего попробуйте отключить одну из нод, желательно ту, к которой подключались из скрипта, затем поправьте параметры подключения в скрипте consumer.py на вторую ноду и запустите его.
 
 *Приложите скриншот результата работы второго скрипта.*
+
+На первом сервере отключил службу rabbitmq
+
+![alt text](image-18.png)
+
+Поправил скрипт:
+
 
 
 ## Дополнительные задания (со звёздочкой*)
