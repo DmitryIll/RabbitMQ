@@ -1,8 +1,16 @@
-output "app_external-ip" {
+output "app_external-ip-ansible" {
+   value="${yandex_compute_instance.ansible[*].network_interface.0.nat_ip_address}"
+}
+
+output "internal-ip-ansible" {
+   value="${yandex_compute_instance.ansible[*].network_interface.0.ip_address}"
+}
+
+output "app_external-ip-vm" {
    value="${yandex_compute_instance.vm[*].network_interface.0.nat_ip_address}"
 }
 
-output "internal-ip" {
+output "internal-ip-vm" {
    value="${yandex_compute_instance.vm[*].network_interface.0.ip_address}"
 }
 

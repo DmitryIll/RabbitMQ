@@ -1,3 +1,5 @@
+# Если ставим вручную без ансибл.
+
 variable hostname_blocks {}
 variable name_bloks {}
 variable images_blocks {}
@@ -52,39 +54,35 @@ resource "yandex_compute_instance" "vm" {
   }
 
 #---------- создаем папки -----
-#  provisioner "remote-exec" {
-#    inline = [
-#     "cd ~",
-#     "mkdir -pv ansible"
-#    ]
-#  }
 
- 
-  provisioner "file" {
-    source      = "../scripts/producer.py"
-    destination = "/root/producer.py"
+  #provisioner "remote-exec" {
+  #  inline = [
+  #   "cd ~",
+  #   "mkdir -pv configs"
+  #  ]
+  #}
+
+
+  
+ provisioner "file" {
+   source      = "../scripts/producer.py"
+   destination = "/root/producer.py"
+ }
+    
+
+#----------------------------------------------------------
+  provisioner "remote-exec" {
+    inline = [
+    "sudo apt update",
+    "sudo apt install -y rabbitmq-server",
+    "sudo rabbitmq-plugins enable rabbitmq_management",
+    "sudo rabbitmqctl add_user test passwd",
+    "sudo rabbitmqctl set_user_tags test administrator",
+    "sudo rabbitmqctl set_permissions -p / test \".*\" \".*\" \".*\"",
+    "sudo echo \"192.168.10.10 rabbitmq1\" >> /etc/hosts",
+    "sudo echo \"192.168.10.11 rabbitmq2\" >> /etc/hosts",
+    ]
   }
- 
-
-  provisioner "file" {
-    source      = "ansible/play.yaml"
-    destination = "/root/play.yaml"
-  }
-
-
-#--- это не делаем т.к. через ансибл ставим все -------------------------------------------------------
-#  provisioner "remote-exec" {
-#    inline = [
-#    "sudo apt update",
-#    "sudo apt install -y rabbitmq-server",
-#    "sudo rabbitmq-plugins enable rabbitmq_management",
-#    "sudo rabbitmqctl add_user test passwd",
-#    "sudo rabbitmqctl set_user_tags test administrator",
-#    "sudo rabbitmqctl set_permissions -p / test \".*\" \".*\" \".*\"",
-#    "sudo echo \"192.168.10.10 rabbitmq1\" >> /etc/hosts",
-#    "sudo echo \"192.168.10.11 rabbitmq2\" >> /etc/hosts",
-#    ]
-#  }
   
 # это через терраформ не заработало:
 #    "sudo apt install -y pip",
